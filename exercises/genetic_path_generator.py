@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 POPULATION_AMOUNT = 100
 SELECTION_AMOUNT = 80
+MUTATION_AMOUNT = 1000
 
 def pop_generator(g):
     logger.info('Generating initial population.')
@@ -47,6 +48,7 @@ def fitness(g, solution):
 def selection(g, population):
     logger.info('Performing selection...')
     # Rensa ut de sämsta individerna
+    logger.info('Generating initial population.')
     population = sorted(population, key=lambda individual: individual['cost'])
     population = population[:SELECTION_AMOUNT]
 
@@ -56,10 +58,17 @@ def selection(g, population):
         parent = random.choice(population)
         pizza_slice = random.randint(1, len(parent['path'])-1)
         child_path = parent['path'][pizza_slice:] + parent['path'][:pizza_slice]
+        if random.randint(1, MUTATION_AMOUNT) == 1:
+            logger.debug('Mutating')
+            child_path = mutation(child_path)
         child = {'path': child_path, 'cost': fitness(g, child_path)}
         population.append(child)
-        logger.debug('Added individual [{}, ...] with cost {} to population.'.formacostt(', '.join(child['path'][:5]), child['cost']))
+        logger.debug('Added individual [{}, ...] with cost {} to population.'.format(', '.join(child['path'][:5]), child['cost']))
     return population
 
-def mutation():
-    pass
+def mutation(path):
+    x = random.randint(1, len(path)-1)
+    y = random.randint(1, len(path)-1)
+    path[x], path[y] = path[y], path[x]
+    logger.debug('{0} mutated ({1} and {2} swapped).'.format(path, x, y))
+    return path
