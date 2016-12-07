@@ -20,11 +20,9 @@ class Graph():
         """Initiera `self._nodes`."""
         self._nodes = {}
 
-
     def neighbours(self, key):
         """Returnera alla grannar till `key`."""
-        return self._nodes(key)
-
+        return [key for key, value in self._nodes[key]]
 
     def add_vertex(self, key):
         """Lägg till en ny nod."""
@@ -64,5 +62,3 @@ class Graph():
     def __iter__(self):
         """Gör det enkelt att iterera över grafens alla noders namn."""
         return iter([t[0] for t in self._nodes[x]])
-
-        

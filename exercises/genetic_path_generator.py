@@ -1,23 +1,65 @@
 from exercises.problem_generation import create_problem
 from exercises.graph import Graph
+from exercises.problem import *
+import logging
 
-
-def fitness(list1):
-    """create_problem makes nodes and edges"""
-    g = create_problem()
-    cost = 0
-    """check if lists exists"""
-    if list1 == None:
-        return False
-    """check which path is cheaper"""
-    for item in list1:
-        i+=1
-        """get the cost of path 1"""
-        cost += g.get_edge_value(item, list1[i])
-    return cost
 
 def selection():
     pass
+
+
+logger = logging.getLogger(__name__)
+
+POPULATION_AMOUNT = 100
+SELECTION_AMOUNT = 80
+
+def pop_generator(g):
+    logger.info('Generating initial population.')
+    all_nodes = g.get_vertices()
+    population = []
+    for x in range(POPULATION_AMOUNT):
+        individual = {'path':random.sample(all_nodes, len(all_nodes))}
+        individual['cost'] = fitness(g, individual['path'])
+        if individual['cost']:
+            population.append(individual)
+        logger.debug('Adding [{}, ...] with fitness value of {} to population' \
+            .format(', '.join(individual['path'][:5]), individual['cost']))
+    return list(population)
+
+def fitness(g, solution):
+    """create_problem makes nodes and edges"""
+    """check if lists exists"""
+    try:
+        cost = 0
+        i = 0
+        for item in solution:
+            if i < len(solution)-1:
+                i += 1
+            else:
+                i = 0
+            """get the cost of the path"""
+            cost += g.get_edge_value(item, solution[i])
+        return cost
+    except KeyError as e:
+        return None
+
+
+def selection(g, population):
+    logger.info('Performing selection...')
+    # Rensa ut de sämsta individerna
+    population = sorted(population, key=lambda individual: individual['cost'])
+    population = population[:SELECTION_AMOUNT]
+
+    # Fyll på med nya individer
+    for i in range(POPULATION_AMOUNT - len(population)):
+        # Generera en ny individ.
+        parent = random.choice(population)
+        pizza_slice = random.randint(1, len(parent['path'])-1)
+        child_path = parent['path'][pizza_slice:] + parent['path'][:pizza_slice]
+        child = {'path': child_path, 'cost': fitness(g, child_path)}
+        population.append(child)
+        logger.debug('Added individual [{}, ...] with cost {} to population.'.formacostt(', '.join(child['path'][:5]), child['cost']))
+    return population
 
 def mutation():
     pass
