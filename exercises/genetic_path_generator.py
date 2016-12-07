@@ -42,15 +42,20 @@ def fitness(g, solution):
 
 def selection(g, population):
     # Rensa ut de sämsta individerna
+    logger.info('Generating initial population.')
     population = sorted(population, key=lambda individual: individual['cost'])
     population = population[:SELECTION_AMOUNT]
 
     # Fyll på med nya individer
-    for i in range(POPULATION_AMOUNT - len(g)):
+    for i in range(POPULATION_AMOUNT - len(population)):
         # Generera en ny individ.
-    
-
-    return g
+        parent = random.choice(population)
+        pizza_slice = random.randint(1, len(parent['path'])-1)
+        child_path = parent['path'][pizza_slice:] + parent['path'][:pizza_slice]
+        child = {'path': child_path, 'cost': fitness(g, child_path)}
+        population.append(child)
+        logger.debug('Added individual [{}, ...] with cost {} to population.'.format(', '.join(child['path'][:5]), child['cost']))
+    return population
 
 def mutation():
     pass

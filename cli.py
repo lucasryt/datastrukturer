@@ -16,7 +16,7 @@ def tests(checkfit):
         problem = generate(5, 5)
 
         population = pop_generator(problem)
-
+        population = selection(problem, population)
         # list1 = ['A', 'B', 'C', 'E', 'D', 'G', 'H', 'F']
         # cost = fitness(problem, list1)
         # click.echo(cost)
