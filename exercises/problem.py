@@ -5,7 +5,6 @@ import logging
 from exercises.graph import Graph
 
 
-logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 

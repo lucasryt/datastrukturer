@@ -4,15 +4,12 @@ from exercises.problem import *
 import logging
 
 
-def selection():
-    pass
-
-
 logger = logging.getLogger(__name__)
 
-POPULATION_AMOUNT = 100
-SELECTION_AMOUNT = 80
-MUTATION_AMOUNT = 1000
+POPULATION_AMOUNT = 1000
+SELECTION_AMOUNT = 500
+MUTATION_AMOUNT = 100
+
 
 def pop_generator(g):
     logger.info('Generating initial population.')
@@ -21,11 +18,13 @@ def pop_generator(g):
     for x in range(POPULATION_AMOUNT):
         individual = {'path':random.sample(all_nodes, len(all_nodes))}
         individual['cost'] = fitness(g, individual['path'])
+        individual['gen'] = 1
         if individual['cost']:
             population.append(individual)
         logger.debug('Adding [{}, ...] with fitness value of {} to population' \
             .format(', '.join(individual['path'][:5]), individual['cost']))
-    return list(population)
+    population = sorted(list(population), key=lambda individual: individual['cost'])
+    return population
 
 def fitness(g, solution):
     """create_problem makes nodes and edges"""
@@ -45,25 +44,23 @@ def fitness(g, solution):
         return None
 
 
-def selection(g, population):
+def selection(g, population, generation):
     logger.info('Performing selection...')
     # Rensa ut de sämsta individerna
-    logger.info('Generating initial population.')
-    population = sorted(population, key=lambda individual: individual['cost'])
     population = population[:SELECTION_AMOUNT]
-
     # Fyll på med nya individer
     for i in range(POPULATION_AMOUNT - len(population)):
         # Generera en ny individ.
-        parent = random.choice(population)
+        parent = random.choice(population)  # Funkar inte som förväntat!
         pizza_slice = random.randint(1, len(parent['path'])-1)
         child_path = parent['path'][pizza_slice:] + parent['path'][:pizza_slice]
         if random.randint(1, MUTATION_AMOUNT) == 1:
             logger.debug('Mutating')
             child_path = mutation(child_path)
-        child = {'path': child_path, 'cost': fitness(g, child_path)}
+        child = {'path': child_path, 'cost': fitness(g, child_path), 'gen': generation}
         population.append(child)
-        logger.debug('Added individual [{}, ...] with cost {} to population.'.format(', '.join(child['path'][:5]), child['cost']))
+        #logger.debug('Added individual [{}, ...] with cost {} to population.'.format(', '.join(child['path'][:5]), child['cost']))
+    population = sorted(population, key=lambda individual: individual['cost'])
     return population
 
 def mutation(path):
